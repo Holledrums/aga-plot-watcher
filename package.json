@@ -4,7 +4,13 @@
   "description": "script to watch changes on a allotment garden association (AGA) website and get notification by mail",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run"
+    "build": "nest build",
+    "start": "node dist/index.js",
+    "start:dev": "nest start --watch --debug",
+    "start:debug": "node --inspect dist/index.js",
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage",
+    "test:watch": "vitest --watch"
   },
   "repository": {
     "type": "git",
@@ -24,6 +30,16 @@
   },
   "homepage": "https://github.com/Holledrums/aga-plot-watcher#readme",
   "devDependencies": {
+    "@nestjs/cli": "^10.4.5",
+    "@types/node": "^22.5.2",
+    "@types/nodemailer": "^6.4.15",
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "nodemailer": "^6.9.14",
+    "source-map-support": "^0.5.21"
   }
 }
