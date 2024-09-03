@@ -1,0 +1,29 @@
+{
+  "name": "aga-plot-watcher",
+  "version": "1.0.0",
+  "description": "script to watch changes on a allotment garden association (AGA) website and get notification by mail",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Holledrums/aga-plot-watcher.git"
+  },
+  "keywords": [
+    "website-monitor",
+    "email-notification",
+    "change-detection",
+    "typescript",
+    "web-scraping"
+  ],
+  "author": "holledrums",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Holledrums/aga-plot-watcher/issues"
+  },
+  "homepage": "https://github.com/Holledrums/aga-plot-watcher#readme",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
