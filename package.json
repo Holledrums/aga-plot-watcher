@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "nest build",
-    "start": "node dist/index.js",
+    "start": "nest build && node dist/index.js",
     "start:dev": "nest start --watch --debug",
     "start:debug": "node --inspect dist/index.js",
     "test": "vitest run",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.4.5",
     "@types/node": "^22.5.2",
-    "@types/nodemailer": "^6.4.15",
+    "@types/nodemailer": "^6.4.17",
     "typescript": "^5.5.4"
   },
   "dependencies": {

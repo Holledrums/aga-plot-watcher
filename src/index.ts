@@ -1,10 +1,11 @@
 import "source-map-support/register";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import * as nodemailer from "nodemailer";
+import nodemailer, { TransportOptions } from "nodemailer";
 import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 dotenv.config();
 
@@ -16,53 +17,56 @@ const smtpPort = process.env.SMTP_PORT
   ? parseInt(process.env.SMTP_PORT, 10)
   : 587;
 
-const smtpHost =
-  process.env.SMTP_HOST ??
-  (() => {
-    throw new Error("SMTP_HOST is not defined");
-  });
-const userEmail =
-  process.env.USER_EMAIL ??
-  (() => {
-    throw new Error("USER_EMAIL is not defined");
-  })();
-const userPassword =
-  process.env.USER_PASSWORD ??
-  (() => {
-    throw new Error("USER_PASSWORD is not defined");
-  })();
+const smtpHost = process.env.SMTP_HOST;
+if (!smtpHost) throw new Error("SMTP_HOST is not defined");
+const userEmail = process.env.USER_EMAIL;
+if (!userEmail) throw new Error("USER_EMAIL is not defined");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+const userPassword = process.env.USER_PASSWORD;
+if (!userPassword) throw new Error("USER_PASSWORD is not defined");
+
+const options: SMTPTransport.Options = {
+  host: smtpHost,
   port: smtpPort,
-  secure: false,
+  secure: smtpPort === 465,
   auth: {
     user: userEmail,
     pass: userPassword,
   },
-  logger: true,
-  debug: true,
-});
+};
+
+const transporter = nodemailer.createTransport(options);
 
 async function checkForUpdates() {
   try {
     const response = await axios.get(url, { timeout: 10000 });
     const $ = cheerio.load(response.data);
-    const content = $("div.entry-content.col.cf").text();
-    console.log(content);
+    const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
 
-    let oldContent = "";
-    if (fs.existsSync(filePath)) {
-      oldContent = fs.readFileSync(filePath, "utf-8");
+    const content = $("div.entry-content.col.cf").text();
+
+    if (content.includes("Momentan sind keine freien Parzellen abzugeben.")) {
+      console.log("Keine Parzellen verfügbar - keine Mail versendet");
+      return;
     }
 
-    if (oldContent !== content) {
+    const match = content.match(
+      /Folgende Gärten.*?(?=Bei Interesse|————————————————)/s
+    );
+
+    const filteredContent = match ? match[0].trim() : content.trim();
+    const newContent = normalize(filteredContent);
+    const oldContent = fs.existsSync(filePath)
+      ? fs.readFileSync(filePath, "utf-8")
+      : "";
+
+    if (newContent !== oldContent) {
       fs.writeFileSync(filePath, content);
       const mailOptions = {
         from: userEmail,
         to: process.env.RECIPIENT_EMAIL,
         subject: "Neue Parzellen verfügbar",
-        text: content,
+        text: filteredContent,
       };
 
       const info = await transporter.sendMail(mailOptions);
