@@ -7,7 +7,7 @@ import * as path from "path";
 import * as dotenv from "dotenv";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
-dotenv.config();
+dotenv.config({ path: __dirname + '/../.env' });
 
 const url = "https://www.kgv-anderdammstrasse.de/freie-parzellen/";
 
